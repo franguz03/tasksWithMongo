@@ -30,7 +30,40 @@ export const register = async (req, res) => {
     console.log(error);
   }
 };
-export const login = (req, res) => {
+
+export const login = async (req, res) => {
   //funcion para la ruta login
-  res.send("login");
+  const { email, password} = req.body; //deconstruimos la peticion
+   
+  try {
+    const userFound= await user.findOne({email:email}) // busca un elemento en la collecion que coincida con el conjunto de datos, si no retorna un falsy
+    
+    if(!userFound) return res.status(400).json({message:"user not found"})//validamos si lo encontro por email
+    
+    const isMatch= await bcrypt.compare(password,userFound.password)//compara un string con un hash, retorna true o false
+    if(!isMatch) return res.status(400).json({message:"incorrect password"})//validamos la contraseña
+    
+    const token = await createAccessToken({id:userFound._id}) // crea un toquen
+    res.cookie('tu token', token)// se guarda en una cookie
+    res.json({
+        id:userFound._id,
+        email:userFound.email,
+        name:userFound.userName
+    });
+  } catch (error) {
+    res.send(error);
+    console.log(error);
+  }
 };
+
+export const logout = (req, res) => {
+  // Elimina la cookie llamada 'tu token' estableciendo su valor como null
+  // y configurando su fecha de expiración en una fecha pasada (para eliminarla inmediatamente).
+  res.cookie('tu token', null, {
+    expires: new Date(0)
+  });
+
+  // Envía un código de estado 200 (OK) al cliente para indicar que la operación se realizó correctamente.
+  return res.sendStatus(200);
+}
+
