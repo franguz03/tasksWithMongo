@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { TOKEN_SECRET } from '../config.js'
 
 export const authrequired =(req,res,next)=>{ //middleware utilizado para cunado se hace una peticion a la ruta profile
-    
+    console.log("midlleware")
     const {token} = req.cookies// tomamos los tokens del request(los headers guardan los token en un login y los mandan asi no haya un body y sea un get)
 
     if (!token) 

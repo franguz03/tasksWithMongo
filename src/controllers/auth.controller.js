@@ -45,7 +45,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "incorrect password" }); //validamos la contraseña
 
     const token = await createAccessToken({ id: userFound._id }); // crea un toquen
-    res.cookie('token', token); // se guarda en una cookie
+    res.cookie("token", token); // se guarda en una cookie
     res.json({
       id: userFound._id,
       email: userFound.email,
@@ -60,7 +60,7 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   // Elimina la cookie llamada 'tu token' estableciendo su valor como null
   // y configurando su fecha de expiración en una fecha pasada (para eliminarla inmediatamente).
-  res.cookie('token', "", {
+  res.cookie("token", "", {
     expires: new Date(0),
   });
 
@@ -68,13 +68,15 @@ export const logout = (req, res) => {
   return res.sendStatus(200);
 };
 
-export const profile = async (req, res) => { //peticion get para obtener los datos del perfil previamente logueado
-  const userFound= await user.findById(req.user.id) //obetenemos el user con el la propiedad user que añadimos en el middleware
-  if (!userFound) return res.status(400).json({message:"user not found"})// no se encontro el usuario en la bd 400
-  
-  return res.json({// si se encuentra retornamos este objeto
+export const profile = async (req, res) => {
+  //peticion get para obtener los datos del perfil previamente logueado
+  const userFound = await user.findById(req.user.id); //obetenemos el user con el la propiedad user que añadimos en el middleware
+  if (!userFound) return res.status(400).json({ message: "user not found" }); // no se encontro el usuario en la bd 400
 
-    email:userFound.email,
-    userName:userFound.userName
-  })
+  return res.json({
+    // si se encuentra retornamos este objeto
+
+    email: userFound.email,
+    userName: userFound.userName,
+  });
 };
