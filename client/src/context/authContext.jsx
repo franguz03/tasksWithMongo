@@ -17,6 +17,7 @@ export const useAuth = () => {
 // Proveedor del contexto de autenticación
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Estado para almacenar el usuario
+    const [errosRegister, setErrosRegister]=useState([]) // estado para manejar los errores de la peticion register
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para almacenar si el usuario está autenticado
 
     // Función para registrarse
@@ -27,13 +28,14 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data); // Establecer el usuario en el estado
             setIsAuthenticated(true); // Marcar como autenticado
         } catch (error) {
-            console.log(error); // Manejar errores de registro
+            console.log(error.response); // Manejar errores de registro
+            setErrosRegister(error.response.data)
         }
     };
 
     // Proveer el contexto de autenticación a los componentes hijos
     return (
-        <AuthContext.Provider value={{ signup, user, isAuthenticated }}>
+        <AuthContext.Provider value={{ signup, user, isAuthenticated,errosRegister }}>
             {children}
         </AuthContext.Provider>
     );

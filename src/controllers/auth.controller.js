@@ -7,6 +7,9 @@ export const register = async (req, res) => {
   const { email, password, userName } = req.body; //deconstruimos la peticion
 
   try {
+    const userFound=await user.findOne({email})
+    console.log("correo repetido--", userFound)
+    if (userFound) return res.status(400).json(['the email already exists'])// verificamos si el email ingresado para el registro ya existe y retornamos 400
     const passwordHash = await bcrypt.hash(password, 10); // devuelve un string aleatorio para encriptar la contraseña
 
     const newUser = new user({
