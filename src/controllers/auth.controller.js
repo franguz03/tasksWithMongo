@@ -41,11 +41,11 @@ export const login = async (req, res) => {
   try {
     const userFound = await user.findOne({ email: email }); // busca un elemento en la collecion que coincida con el conjunto de datos, si no retorna un falsy
 
-    if (!userFound) return res.status(400).json({ message: "user not found" }); //validamos si lo encontro por email
+    if (!userFound) return res.status(400).json(["user not found"]  ); //validamos si lo encontro por email
 
     const isMatch = await bcrypt.compare(password, userFound.password); //compara un string con un hash, retorna true o false
     if (!isMatch)
-      return res.status(400).json({ message: "incorrect password" }); //validamos la contraseña
+      return res.status(400).json([ "incorrect password" ]); //validamos la contraseña
 
     const token = await createAccessToken({ id: userFound._id }); // crea un toquen
     res.cookie("token", token); // se guarda en una cookie

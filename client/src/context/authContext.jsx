@@ -1,5 +1,5 @@
-import { createContext, useState, useContext } from "react";
-import { registerRequest } from '../api/auth.js';
+import { createContext, useState, useContext, useEffect } from "react";
+import { registerRequest,loginRequest } from '../api/auth.js';
 
 // Crear el contexto de autenticación
 export const AuthContext = createContext();
@@ -19,7 +19,14 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Estado para almacenar el usuario
     const [errosRegister, setErrosRegister]=useState([]) // estado para manejar los errores de la peticion register
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para almacenar si el usuario está autenticado
-
+    useEffect(()=>{
+        if (errosRegister.length>0){
+            const timer =setTimeout(()=>{
+                setErrosRegister([])
+            },5000)
+            return ()=> clearTimeout(timer)
+        }
+    },[errosRegister])
     // Función para registrarse
     const signup = async (user) => {
         try {
@@ -32,10 +39,19 @@ export const AuthProvider = ({ children }) => {
             setErrosRegister(error.response.data)
         }
     };
-
+    // Función para iniciar sesión
+    const signin = async (user) => {
+        try {
+            const res = await loginRequest(user)
+            console.log(res.data)
+        } catch (error) {
+            setErrosRegister(error.response.data)
+            
+        }
+    }
     // Proveer el contexto de autenticación a los componentes hijos
     return (
-        <AuthContext.Provider value={{ signup, user, isAuthenticated,errosRegister }}>
+        <AuthContext.Provider value={{signin, signup, user, isAuthenticated,errosRegister }}>
             {children}
         </AuthContext.Provider>
     );

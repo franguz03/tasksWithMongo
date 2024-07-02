@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function RegisterPage() {
   // Inicializa el hook useForm para manejar el formulario
@@ -63,6 +64,7 @@ function RegisterPage() {
         {/* Botón para enviar el formulario */}
         <button type="submit">Register</button>
       </form>
+      <p className="flex gap-x-2 justify-between">Already have a account? <Link className="text-sky-500" to="/login">Singin</Link></p>
     </div>
   );
 }
