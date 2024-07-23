@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { registerRequest,loginRequest } from '../api/auth.js';
+import { registerRequest,loginRequest,verifyTokenRequest } from '../api/auth.js';
+import Cookies from 'js-cookie'
 
 // Crear el contexto de autenticación
 export const AuthContext = createContext();
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Estado para almacenar el usuario
     const [errosRegister, setErrosRegister]=useState([]) // estado para manejar los errores de la peticion register
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para almacenar si el usuario está autenticado
+    const [loading,setLoading]=useState(true)
     useEffect(()=>{
         if (errosRegister.length>0){
             const timer =setTimeout(()=>{
@@ -27,6 +29,39 @@ export const AuthProvider = ({ children }) => {
             return ()=> clearTimeout(timer)
         }
     },[errosRegister])
+
+    useEffect(()=>{
+
+        async function checkLogin(){
+        const cookies = Cookies.get()
+        if (!cookies.token) {
+           setIsAuthenticated(false)
+           setLoading(false)
+           return setUser(null)
+        }
+        try {
+            const res = await verifyTokenRequest(cookies.token)
+            console.log("validacion token res",res)
+            if (!res.data){
+                setIsAuthenticated(false)
+                setLoading(false)
+                return
+            }
+            setIsAuthenticated(true)
+            setUser(res.data)
+            setLoading(false)
+
+        } catch (error) {
+            console.log(error)
+            setIsAuthenticated(false)
+            setUser(null)
+            setLoading(false)
+            
+        }
+
+        }
+        checkLogin()
+    },[])
     // Función para registrarse
     const signup = async (user) => {
         try {
@@ -43,6 +78,8 @@ export const AuthProvider = ({ children }) => {
     const signin = async (user) => {
         try {
             const res = await loginRequest(user)
+            setUser(res.data)
+            setIsAuthenticated(true);
             console.log(res.data)
         } catch (error) {
             setErrosRegister(error.response.data)
@@ -51,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     }
     // Proveer el contexto de autenticación a los componentes hijos
     return (
-        <AuthContext.Provider value={{signin, signup, user, isAuthenticated,errosRegister }}>
+        <AuthContext.Provider value={{signin, signup, user, isAuthenticated,errosRegister,loading }}>
             {children}
         </AuthContext.Provider>
     );

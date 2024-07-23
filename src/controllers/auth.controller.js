@@ -1,6 +1,8 @@
 import user from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { createAccessToken } from "../libs/jwt.js";
+import jwt from 'jsonwebtoken'
+import { TOKEN_SECRET } from "../config.js";
 
 export const register = async (req, res) => {
   //funcion para la ruta register
@@ -22,7 +24,7 @@ export const register = async (req, res) => {
     console.log(newUser);
     const userSaved = await newUser.save(); // con esa funcion lo mandamos a la bd
     const token = await createAccessToken({ id: userSaved._id }); // crea un toquen
-    res.cookie("tu token", token); // se guarda en una cookie
+    res.cookie("token", token); // se guarda en una cookie
     res.json({
       id: userSaved._id,
       email: userSaved.email,
@@ -83,3 +85,25 @@ export const profile = async (req, res) => {
     userName: userFound.userName,
   });
 };
+
+export const verifyToken = async (req,res)=>{
+  const {token}=req.cookies
+  if(!token) return res.status(401).json({message:'unauthorized'})
+  
+  jwt.verify(token,TOKEN_SECRET, async (err,User)=>{
+    if (err) return res.status(401).json({message:'unauthorized'})
+
+      const userFound = await user.findById(User.id)
+
+      if (!userFound) res.status(401).json({message:'unauthorized'})
+
+      return res.json({
+        id:userFound._id,
+        username:userFound.userName,
+        email: userFound.email,
+      })
+  })
+
+
+  
+}

@@ -8,7 +8,9 @@ import cors from 'cors'
 
 const app=express()//instancia de express
 app.use(cors(// soluciona el conflicto entre dominios en el explorador cuando se corre front y back
-   {origin: 'http://localhost:5173'} 
+   {origin: 'http://localhost:5173',
+    credentials:true
+   } 
 ))
 app.use(express.json())//para que pueda leer los request en formato json
 app.use(cookieParser())//usamos el parser en app
