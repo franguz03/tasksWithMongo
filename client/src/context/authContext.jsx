@@ -62,6 +62,12 @@ export const AuthProvider = ({ children }) => {
         }
         checkLogin()
     },[])
+
+    const logout=()=>{
+        Cookies.remove('token')
+        setIsAuthenticated(false)
+        setUser(null)
+    }
     // Función para registrarse
     const signup = async (user) => {
         try {
@@ -88,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     }
     // Proveer el contexto de autenticación a los componentes hijos
     return (
-        <AuthContext.Provider value={{signin, signup, user, isAuthenticated,errosRegister,loading }}>
+        <AuthContext.Provider value={{signin, signup, user, isAuthenticated,errosRegister,loading,logout }}>
             {children}
         </AuthContext.Provider>
     );
